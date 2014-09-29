@@ -6,7 +6,6 @@ import com.google.api.ads.dfa.axis.v1_20.ActiveFilter;
 import com.google.api.ads.dfa.axis.v1_20.SortOrder;
 import com.google.api.ads.dfa.axis.v1_20.UserRecordSet;
 import com.google.api.ads.dfa.axis.v1_20.UserRemote;
-import com.google.api.ads.dfa.axis.v1_20.UserRemoteService;
 import com.google.api.ads.dfa.axis.v1_20.UserRole;
 import com.google.api.ads.dfa.axis.v1_20.UserRoleRecordSet;
 import com.google.api.ads.dfa.axis.v1_20.UserRoleRemote;
