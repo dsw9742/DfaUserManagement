@@ -5,6 +5,10 @@
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>Dfa User Management</name>
+  <description></description>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
   <dependencies>
    	
    	<!-- DFA API -->
@@ -35,9 +39,18 @@
       <artifactId>slf4j-log4j12</artifactId>
       <version>1.6.2</version>
     </dependency>
+    
   </dependencies>
   <build>
     <sourceDirectory>src</sourceDirectory>
+    <resources>
+      <resource>
+        <directory>src</directory>
+        <excludes>
+          <exclude>**/*.java</exclude>
+        </excludes>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -46,6 +59,24 @@
           <source>1.7</source>
           <target>1.7</target>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+	    <artifactId>exec-maven-plugin</artifactId>
+	    <version>1.2.1</version>
+	    <executions>
+	      <execution>
+	        <goals>
+	          <goal>java</goal>
+	        </goals>
+	      </execution>
+	    </executions>
+	    <configuration>
+	      <mainClass>main.java.Main</mainClass>
+	      <arguments>
+	        <argument>-f "C:/Users/douglas.whitehead/git/DfaUserManagement/pom.xml"</argument>
+	      </arguments>
+	    </configuration>
       </plugin>
     </plugins>
   </build>
