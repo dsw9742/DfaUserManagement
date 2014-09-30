@@ -4,10 +4,14 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.Date;
 
 import com.google.api.ads.common.lib.auth.OfflineCredentials;
 import com.google.api.ads.dfa.axis.factory.DfaServices;
 import com.google.api.ads.dfa.axis.v1_20.ActiveFilter;
+import com.google.api.ads.dfa.axis.v1_20.ObjectFilter;
 import com.google.api.ads.dfa.axis.v1_20.SortOrder;
 import com.google.api.ads.dfa.axis.v1_20.User;
 import com.google.api.ads.dfa.axis.v1_20.UserFilter;
@@ -35,8 +39,11 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) throws Exception {
+		Calendar calendar = Calendar.getInstance();
+		Date now = calendar.getTime();
+		Timestamp currentTimestamp = new Timestamp(now.getTime());
 		
-		createFile("UserRoleChange.log");
+		createFile("UserRoleChange-" + currentTimestamp + ".log");
 		
 	    // Generate a refreshable OAuth2 credential, which replaces legacy passwords
 	    // and can be used in place of a service account.
@@ -124,22 +131,28 @@ public class Main {
 		    }
 		    UserSaveResult[] userSaveResults = new UserSaveResult[users.length];
 		    for (int u=0;u<users.length;u++) {
-		    	out("userRoleUserFilter: " + users[u].getUserRoleUserFilter(), bw);
-		    	//UserFilter userRoleUserFilter = new UserFilter();
-		    	//userRoleUserFilter.
-		    	//users[u].setUserRoleFilter(userRoleUserFilter);
-		    	users[u].setUserGroupId(newUserRoleId);
-		    	//userSaveResults[u] = userRemote.saveUser(users[u]);
+		    	
+		    	ObjectFilter allowedObject = new ObjectFilter();
+		    	allowedObject.setId(newUserRoleId);
+		    	ObjectFilter[] objectFilters = {allowedObject};
+		    	
+		    	UserFilter userRoleUserFilter = new UserFilter();
+		    	userRoleUserFilter.setUserFilterCriteriaId(2); // set to Assigned criteria
+		    	userRoleUserFilter.setObjectFilters(objectFilters); // assign object filter
+
+				users[u].setUserRoleUserFilter(userRoleUserFilter); // set user role filter
+		    	users[u].setUserGroupId(newUserRoleId); // set user role
+		    	
+		    	// Save user
+		    	userSaveResults[u] = userRemote.saveUser(users[u]);
 		    }
 		    
 		    // Print results.
-		    /*
 		    userSearchCriteria.setUserRoleId(newUserRoleId);
 		    UserRecordSet resultsUserRecordSet = userRemote.getUsersByCriteria(userSearchCriteria);
 		    for (User user:resultsUserRecordSet.getRecords()) {
 		    	out(user.getId() + "\t" + user.getName() + "\t" + user.getUserGroupId() + "\n", bw);		    	
 		    }
-		    */
 	    } else {
 	    	out("Invalid Id for old user role and/or new user role. Skipping role change for users.\n", bw);
 	    }
