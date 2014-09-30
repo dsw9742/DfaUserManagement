@@ -143,6 +143,9 @@ public class Main {
 				users[u].setUserRoleUserFilter(userRoleUserFilter); // set user role filter
 		    	users[u].setUserGroupId(newUserRoleId); // set user role
 		    	
+		    	// Print to out to help with debugging user saves.
+		    	System.out.println("Saving user Id " + users[u].getId() + ".");
+		    	
 		    	// Save user
 		    	userSaveResults[u] = userRemote.saveUser(users[u]);
 		    	out("Saved user Id " + userSaveResults[u].getId() + ".\n", bw);
