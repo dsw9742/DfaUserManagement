@@ -1,10 +1,20 @@
 package main.java;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.Date;
+
 import com.google.api.ads.common.lib.auth.OfflineCredentials;
 import com.google.api.ads.dfa.axis.factory.DfaServices;
 import com.google.api.ads.dfa.axis.v1_20.ActiveFilter;
+import com.google.api.ads.dfa.axis.v1_20.ObjectFilter;
 import com.google.api.ads.dfa.axis.v1_20.SortOrder;
 import com.google.api.ads.dfa.axis.v1_20.User;
+import com.google.api.ads.dfa.axis.v1_20.UserFilter;
 import com.google.api.ads.dfa.axis.v1_20.UserRecordSet;
 import com.google.api.ads.dfa.axis.v1_20.UserRemote;
 import com.google.api.ads.dfa.axis.v1_20.UserRole;
@@ -20,11 +30,21 @@ public class Main {
 	
 	public static String oldUserRoleName = "Advertiser/Reporting Login";
 	public static String newUserRoleName = "Vendor Reporting";
+	
+	private static File file;
+	private static FileWriter fw;
+	private static BufferedWriter bw;
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) throws Exception {
+		Calendar calendar = Calendar.getInstance();
+		Date now = calendar.getTime();
+		Timestamp currentTimestamp = new Timestamp(now.getTime());
+		
+		createFile("UserRoleChange-" + String.valueOf(currentTimestamp.getTime()) + ".log");
+		
 	    // Generate a refreshable OAuth2 credential, which replaces legacy passwords
 	    // and can be used in place of a service account.
 	    Credential oAuth2Credential = new com.google.api.ads.common.lib.auth.OfflineCredentials.Builder()
@@ -61,7 +81,7 @@ public class Main {
 	    for (UserRole oldUserRole: oldUserRoles) {
 	    	if (oldUserRole.getSubnetworkId() == 0 && oldUserRole.getName().equals(oldUserRoleName)) { // if no subnetwork and old user role name matches exactly
 	    	    oldUserRoleId = oldUserRole.getId();
-	    	    System.out.println("Old User Role Id is " + oldUserRoleId);
+	    	    out("Old User Role Id is " + oldUserRoleId + ".\n", bw);
 	    	}
 	    }
 
@@ -81,13 +101,13 @@ public class Main {
 	    for (UserRole newUserRole: newUserRoles) {
 	    	if (newUserRole.getSubnetworkId() == 0 && newUserRole.getName().equals(newUserRoleName)) { // if no subnetwork and new user role name matches exactly
 	    	    newUserRoleId = newUserRole.getId();
-	    	    System.out.println("New User Role Id is " + newUserRoleId);
+	    	    out("New User Role Id is " + newUserRoleId + ".\n", bw);
 	    	}
 	    }
 
 	    // Proceed only if valid user role ids have been found
 	    if (oldUserRoleId != 0 && newUserRoleId != 0) {
-	    	System.out.println("Valid Ids for old user role and new user role. Making role change for users.");
+	    	out("Valid Ids for old user role and new user role. Making role change for users.\n", bw);
 	    	
 	    	// Request the user service.
 		    UserRemote userRemote = dfaServices.get(session, UserRemote.class);
@@ -106,22 +126,62 @@ public class Main {
 		    
 		    // Change user roles.
 		    User[] users = userRecordSet.getRecords();
+		    if (users.length > 0) {
+		    	out("Users with role change:\n", bw);
+		    }
 		    UserSaveResult[] userSaveResults = new UserSaveResult[users.length];
 		    for (int u=0;u<users.length;u++) {
-		    	users[u].setUserGroupId(newUserRoleId);
+		    	
+		    	ObjectFilter allowedObject = new ObjectFilter();
+		    	allowedObject.setId(newUserRoleId);
+		    	ObjectFilter[] objectFilters = {allowedObject};
+		    	
+		    	UserFilter userRoleUserFilter = new UserFilter();
+		    	userRoleUserFilter.setUserFilterCriteriaId(2); // set to Assigned criteria
+		    	userRoleUserFilter.setObjectFilters(objectFilters); // assign object filter
+
+				users[u].setUserRoleUserFilter(userRoleUserFilter); // set user role filter
+		    	users[u].setUserGroupId(newUserRoleId); // set user role
+		    	
+		    	// Print to out to help with debugging user saves.
+		    	System.out.println("Saving user Id " + users[u].getId() + ".");
+		    	
+		    	// Save user
 		    	userSaveResults[u] = userRemote.saveUser(users[u]);
+		    	out("Saved user Id " + userSaveResults[u].getId() + ".\n", bw);
 		    }
 		    
 		    // Print results.
 		    userSearchCriteria.setUserRoleId(newUserRoleId);
 		    UserRecordSet resultsUserRecordSet = userRemote.getUsersByCriteria(userSearchCriteria);
 		    for (User user:resultsUserRecordSet.getRecords()) {
-		    	System.out.println(user.getId() + "\t" + user.getName() + "\t" + user.getUserGroupId());		    	
+		    	out(user.getId() + "\t" + user.getName() + "\t" + user.getUserGroupId() + "\n", bw);		    	
 		    }
 	    } else {
-	    	System.out.println("Invalid Id for old user role and/or new user role. Skipping role change for users.");
+	    	out("Invalid Id for old user role and/or new user role. Skipping role change for users.\n", bw);
 	    }
-	    System.out.println("Complete.");
+	    out("Complete.\n", bw);
+		bw.close();
+	    fw.close();
+	}
+	
+	// helper function to create output files
+	private static void createFile(String fileName) throws IOException {
+		
+		file = new File(fileName);
+		if (!file.exists()) {
+			file.createNewFile();
+		}
+		fw = new FileWriter(file.getAbsoluteFile());
+		bw = new BufferedWriter(fw);
+	}
+	
+	// helper function to dual-stream text to CLI and text file
+	private static void out(String text, BufferedWriter bw) throws IOException {
+		// write to file
+		bw.write(text);
+		// print to CLI
+		System.out.print(text);
 	}
 
 }

@@ -73,9 +73,6 @@
 	    </executions>
 	    <configuration>
 	      <mainClass>main.java.Main</mainClass>
-	      <arguments>
-	        <argument>-f "C:/Users/douglas.whitehead/git/DfaUserManagement/pom.xml"</argument>
-	      </arguments>
 	    </configuration>
       </plugin>
     </plugins>
