@@ -10,6 +10,7 @@ import com.google.api.ads.dfa.axis.factory.DfaServices;
 import com.google.api.ads.dfa.axis.v1_20.ActiveFilter;
 import com.google.api.ads.dfa.axis.v1_20.SortOrder;
 import com.google.api.ads.dfa.axis.v1_20.User;
+import com.google.api.ads.dfa.axis.v1_20.UserFilter;
 import com.google.api.ads.dfa.axis.v1_20.UserRecordSet;
 import com.google.api.ads.dfa.axis.v1_20.UserRemote;
 import com.google.api.ads.dfa.axis.v1_20.UserRole;
@@ -123,16 +124,22 @@ public class Main {
 		    }
 		    UserSaveResult[] userSaveResults = new UserSaveResult[users.length];
 		    for (int u=0;u<users.length;u++) {
+		    	out("userRoleUserFilter: " + users[u].getUserRoleUserFilter(), bw);
+		    	//UserFilter userRoleUserFilter = new UserFilter();
+		    	//userRoleUserFilter.
+		    	//users[u].setUserRoleFilter(userRoleUserFilter);
 		    	users[u].setUserGroupId(newUserRoleId);
-		    	userSaveResults[u] = userRemote.saveUser(users[u]);
+		    	//userSaveResults[u] = userRemote.saveUser(users[u]);
 		    }
 		    
 		    // Print results.
+		    /*
 		    userSearchCriteria.setUserRoleId(newUserRoleId);
 		    UserRecordSet resultsUserRecordSet = userRemote.getUsersByCriteria(userSearchCriteria);
 		    for (User user:resultsUserRecordSet.getRecords()) {
 		    	out(user.getId() + "\t" + user.getName() + "\t" + user.getUserGroupId() + "\n", bw);		    	
 		    }
+		    */
 	    } else {
 	    	out("Invalid Id for old user role and/or new user role. Skipping role change for users.\n", bw);
 	    }
