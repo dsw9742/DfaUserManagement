@@ -25,8 +25,6 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) throws Exception {
-		System.out.println("main entered");
-		
 	    // Generate a refreshable OAuth2 credential, which replaces legacy passwords
 	    // and can be used in place of a service account.
 	    Credential oAuth2Credential = new com.google.api.ads.common.lib.auth.OfflineCredentials.Builder()
@@ -43,7 +41,7 @@ public class Main {
 
 	    // Construct a DfaServices.
 	    DfaServices dfaServices = new DfaServices();
-	    
+
 	    // Request the user role service.
 	    UserRoleRemote userRoleRemote = dfaServices.get(session, UserRoleRemote.class);
 	    	    
@@ -61,11 +59,11 @@ public class Main {
 	    UserRoleRecordSet oldUserRoleRecordSet = userRoleRemote.getUserRoles(oldUserRoleSearchCriteria);
 	    UserRole[] oldUserRoles = oldUserRoleRecordSet.getUserRoles();
 	    for (UserRole oldUserRole: oldUserRoles) {
-	    	if (oldUserRole.getSubnetworkId() == 0 && oldUserRole.getName() == oldUserRoleName) { // if no subnetwork and old user role name matches exactly
+	    	if (oldUserRole.getSubnetworkId() == 0 && oldUserRole.getName().equals(oldUserRoleName)) { // if no subnetwork and old user role name matches exactly
 	    	    oldUserRoleId = oldUserRole.getId();
 	    	}
 	    }
-	    
+
 	    // Define the new user role search criteria.
 	    UserRoleSearchCriteria newUserRoleSearchCriteria = new UserRoleSearchCriteria();
 	    newUserRoleSearchCriteria.setSearchString(newUserRoleName);
@@ -80,7 +78,7 @@ public class Main {
 	    UserRoleRecordSet newUserRoleRecordSet = userRoleRemote.getUserRoles(newUserRoleSearchCriteria);
 	    UserRole[] newUserRoles = newUserRoleRecordSet.getUserRoles();
 	    for (UserRole newUserRole: newUserRoles) {
-	    	if (newUserRole.getSubnetworkId() == 0 && newUserRole.getName() == newUserRoleName) { // if no subnetwork and new user role name matches exactly
+	    	if (newUserRole.getSubnetworkId() == 0 && newUserRole.getName().equals(newUserRoleName)) { // if no subnetwork and new user role name matches exactly
 	    	    newUserRoleId = newUserRole.getId();
 	    	}
 	    }
