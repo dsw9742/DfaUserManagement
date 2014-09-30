@@ -36,9 +36,6 @@ public class Main {
 	public static void main(String[] args) throws Exception {
 		
 		createFile("UserRoleChange.log");
-		bw.close();
-	    fw.close();
-		
 		
 	    // Generate a refreshable OAuth2 credential, which replaces legacy passwords
 	    // and can be used in place of a service account.
@@ -76,7 +73,7 @@ public class Main {
 	    for (UserRole oldUserRole: oldUserRoles) {
 	    	if (oldUserRole.getSubnetworkId() == 0 && oldUserRole.getName().equals(oldUserRoleName)) { // if no subnetwork and old user role name matches exactly
 	    	    oldUserRoleId = oldUserRole.getId();
-	    	    out("Old User Role Id is " + oldUserRoleId, bw);
+	    	    out("Old User Role Id is " + oldUserRoleId + ".\n", bw);
 	    	}
 	    }
 
@@ -96,13 +93,13 @@ public class Main {
 	    for (UserRole newUserRole: newUserRoles) {
 	    	if (newUserRole.getSubnetworkId() == 0 && newUserRole.getName().equals(newUserRoleName)) { // if no subnetwork and new user role name matches exactly
 	    	    newUserRoleId = newUserRole.getId();
-	    	    out("New User Role Id is " + newUserRoleId, bw);
+	    	    out("New User Role Id is " + newUserRoleId + ".\n", bw);
 	    	}
 	    }
 
 	    // Proceed only if valid user role ids have been found
 	    if (oldUserRoleId != 0 && newUserRoleId != 0) {
-	    	out("Valid Ids for old user role and new user role. Making role change for users.", bw);
+	    	out("Valid Ids for old user role and new user role. Making role change for users.\n", bw);
 	    	
 	    	// Request the user service.
 		    UserRemote userRemote = dfaServices.get(session, UserRemote.class);
@@ -121,6 +118,9 @@ public class Main {
 		    
 		    // Change user roles.
 		    User[] users = userRecordSet.getRecords();
+		    if (users.length > 0) {
+		    	out("Users with role change:\n", bw);
+		    }
 		    UserSaveResult[] userSaveResults = new UserSaveResult[users.length];
 		    for (int u=0;u<users.length;u++) {
 		    	users[u].setUserGroupId(newUserRoleId);
@@ -131,12 +131,14 @@ public class Main {
 		    userSearchCriteria.setUserRoleId(newUserRoleId);
 		    UserRecordSet resultsUserRecordSet = userRemote.getUsersByCriteria(userSearchCriteria);
 		    for (User user:resultsUserRecordSet.getRecords()) {
-		    	out(user.getId() + "\t" + user.getName() + "\t" + user.getUserGroupId(), bw);		    	
+		    	out(user.getId() + "\t" + user.getName() + "\t" + user.getUserGroupId() + "\n", bw);		    	
 		    }
 	    } else {
-	    	out("Invalid Id for old user role and/or new user role. Skipping role change for users.", bw);
+	    	out("Invalid Id for old user role and/or new user role. Skipping role change for users.\n", bw);
 	    }
-	    out("Complete.", bw);
+	    out("Complete.\n", bw);
+		bw.close();
+	    fw.close();
 	}
 	
 	// helper function to create output files
