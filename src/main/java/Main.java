@@ -61,6 +61,7 @@ public class Main {
 	    for (UserRole oldUserRole: oldUserRoles) {
 	    	if (oldUserRole.getSubnetworkId() == 0 && oldUserRole.getName().equals(oldUserRoleName)) { // if no subnetwork and old user role name matches exactly
 	    	    oldUserRoleId = oldUserRole.getId();
+	    	    System.out.println("Old User Role Id is " + oldUserRoleId);
 	    	}
 	    }
 
@@ -80,11 +81,14 @@ public class Main {
 	    for (UserRole newUserRole: newUserRoles) {
 	    	if (newUserRole.getSubnetworkId() == 0 && newUserRole.getName().equals(newUserRoleName)) { // if no subnetwork and new user role name matches exactly
 	    	    newUserRoleId = newUserRole.getId();
+	    	    System.out.println("New User Role Id is " + newUserRoleId);
 	    	}
 	    }
 
 	    // Proceed only if valid user role ids have been found
 	    if (oldUserRoleId != 0 && newUserRoleId != 0) {
+	    	System.out.println("Valid Ids for old user role and new user role. Making role change for users.");
+	    	
 	    	// Request the user service.
 		    UserRemote userRemote = dfaServices.get(session, UserRemote.class);
 		    
@@ -114,7 +118,10 @@ public class Main {
 		    for (User user:resultsUserRecordSet.getRecords()) {
 		    	System.out.println(user.getId() + "\t" + user.getName() + "\t" + user.getUserGroupId());		    	
 		    }
+	    } else {
+	    	System.out.println("Invalid Id for old user role and/or new user role. Skipping role change for users.");
 	    }
+	    System.out.println("Complete.");
 	}
 
 }
