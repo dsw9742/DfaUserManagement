@@ -43,7 +43,7 @@ public class Main {
 		Date now = calendar.getTime();
 		Timestamp currentTimestamp = new Timestamp(now.getTime());
 		
-		createFile("UserRoleChange-" + currentTimestamp + ".log");
+		createFile("UserRoleChange-" + String.valueOf(currentTimestamp.getTime()) + ".log");
 		
 	    // Generate a refreshable OAuth2 credential, which replaces legacy passwords
 	    // and can be used in place of a service account.
@@ -145,6 +145,7 @@ public class Main {
 		    	
 		    	// Save user
 		    	userSaveResults[u] = userRemote.saveUser(users[u]);
+		    	out("Saved user Id " + userSaveResults[u].getId() + ".\n", bw);
 		    }
 		    
 		    // Print results.
