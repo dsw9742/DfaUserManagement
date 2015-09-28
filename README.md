@@ -1,3 +1,6 @@
+Please note: This project uses the old DFA API and is unlikely to work as expected after September 30, 2015.
+
+=================
 DfaUserManagement
 =================
 
